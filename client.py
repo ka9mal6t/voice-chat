@@ -8,8 +8,6 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 48000
 CHUNK = 512
-SERVER_IP = '4.tcp.eu.ngrok.io'  # Адрес сервера
-SERVER_PORT = 13509  # Порт сервера
 
 p = None
 stream = None
@@ -41,7 +39,7 @@ def send_audio():
             break
 
 
-def start_audio():
+def start_audio(SERVER_IP, SERVER_PORT):
     global p, stream, sock, stream_active, recv_thread, send_thread
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -72,8 +70,10 @@ def stop_audio():
     sock.close()
 
 
-def start_button_clicked():
-    start_audio()
+def start_button_clicked(SERVER_IP_entry, SERVER_PORT_entry):
+    SERVER_IP = SERVER_IP_entry.get()
+    SERVER_PORT = int(SERVER_PORT_entry.get())
+    start_audio(SERVER_IP, SERVER_PORT)
     messagebox.showinfo("Info", "Аудио передача начата.")
 
 
@@ -100,10 +100,18 @@ if __name__ == "__main__":
     root.title("Audio Transmission")
     root.geometry("400x600")
 
-    start_button = tk.Button(root, text="Start", command=start_button_clicked, bg="green", fg="white")
+    SERVER_IP_label = tk.Label(root, text="Server IP:")
+    SERVER_IP_label.pack(side='top', expand=1, anchor='c', padx=10, pady=10)
+    SERVER_IP_entry = tk.Entry(root)
+    SERVER_IP_entry.pack(side='top', expand=1, anchor='c', padx=10, pady=1)
 
+    SERVER_PORT_label = tk.Label(root, text="Server Port:")
+    SERVER_PORT_label.pack(side='top', expand=1, anchor='c', padx=10, pady=10)
+    SERVER_PORT_entry = tk.Entry(root)
+    SERVER_PORT_entry.pack(side='top', expand=1, anchor='c', padx=10, pady=1)
+
+    start_button = tk.Button(root, text="Start", command=lambda: start_button_clicked(SERVER_IP_entry, SERVER_PORT_entry), bg="green", fg="white")
     stop_button = tk.Button(root, text="Stop", command=stop_button_clicked, bg="red", fg="white")
-
     mute_button = tk.Button(root, text="Mute", command=mute_button_clicked, bg="yellow", fg="black")
 
     start_button.pack(side='top', expand=1, anchor='c', padx=10, pady=10)
